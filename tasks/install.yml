@@ -1,0 +1,30 @@
+---
+- name: Create Go Testsum Directory
+  become: true
+  file:
+    path: /opt/gotestsum/gotestsum-{{ gotestsum_version }}
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+
+- name: Download Go Testsum
+  become: true
+  get_url:
+    url: "{{ gotestsum_download_url }}"
+    dest: /opt/gotestsum/gotestsum-{{ gotestsum_version }}/gotestsum-{{ gotestsum_version }}.tar.gz
+
+- name: Install Go Testsum
+  become: true
+  unarchive:
+    src: /opt/gotestsum/gotestsum-{{ gotestsum_version }}/gotestsum-{{ gotestsum_version }}.tar.gz
+    dest: /opt/gotestsum/gotestsum-{{ gotestsum_version }}/
+
+- name: Add Go Testsum binaries to PATH
+  become: true
+  blockinfile:
+    path: "/etc/profile"
+    marker_begin: "BEGIN GOTESTSUMPATH"
+    marker_end: "END GOTESTSUMPATH"
+    block: |
+      export PATH="$PATH:/opt/gotestsum/gotestsum-{{ gotestsum_version }}"

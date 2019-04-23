@@ -1,0 +1,20 @@
+---
+- name: Old Go Testsum Identifier
+  become: true
+  find:
+    paths: /opt/gotestsum
+    pattern: "gotestsum-\\d+\\.\\d+\\.\\d+$"
+    recurse: no
+    file_type: directory
+    use_regex: yes
+    excludes: "gotestsum-{{ gotestsum_version }}"
+  register: gotestsum_old_installations
+
+- name: Delete Old Go Testsum Installations
+  become: true
+  file:
+    path: "{{ item.path }}"
+    state: absent
+  with_items: "{{ gotestsum_old_installations.files }}"
+  when: gotestsum_old_installations.matched != 0
+
